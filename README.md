@@ -32,7 +32,7 @@ Follow these steps to set up the project locally:
 
 ```bash
 git clone https://github.com/AlbertQuarshie/task-manager.git
-cd team-task-manager
+cd task-manager
 ```
 
 ### 2. Install Dependencies

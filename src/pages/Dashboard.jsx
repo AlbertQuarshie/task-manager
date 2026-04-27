@@ -2,40 +2,62 @@ import { useState, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTask, deleteTask, toggleTask } from '../redux/taskSlice';
 import { TaskForm } from '../components/TaskForm';
-import TaskList from '../components/TaskList'; // NOTICE: No curly braces here
+import TaskList from '../components/TaskList';
 
 const Dashboard = () => {
   const [filter, setFilter] = useState('All');
   const tasks = useSelector((state) => state.tasks.items);
   const dispatch = useDispatch();
 
+  // Receives the title string from TaskForm
   const handleAddTask = (title) => {
-    if (!title.trim()) return;
-    dispatch(addTask({ id: Date.now(), title, status: 'Pending' }));
+    const newTask = {
+      id: Date.now(),
+      title: title,
+      status: 'Pending',
+    };
+    dispatch(addTask(newTask));
   };
 
-  const handleDelete = useCallback((id) => dispatch(deleteTask(id)), [dispatch]);
-  const handleToggle = useCallback((id) => dispatch(toggleTask(id)), [dispatch]);
+  const handleDelete = useCallback((id) => {
+    dispatch(deleteTask(id));
+  }, [dispatch]);
+
+  const handleToggle = useCallback((id) => {
+    dispatch(toggleTask(id));
+  }, [dispatch]);
 
   const filteredTasks = useMemo(() => {
     if (filter === 'All') return tasks;
-    return tasks.filter(t => t.status === filter);
+    return tasks.filter((t) => t.status === filter);
   }, [tasks, filter]);
 
   return (
     <div className="max-w-2xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Team Tasks</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Team Dashboard</h1>
+      
+      {/* Task Input */}
       <TaskForm onAdd={handleAddTask} />
       
-      <div className="my-4 flex gap-2">
-        {['All', 'Pending', 'Completed'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} className="border px-3 py-1 rounded">
+      {/* Filter Tabs */}
+      <div className="flex gap-2 mb-6">
+        {['All', 'Pending', 'Completed'].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+              filter === f ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+            }`}
+          >
             {f}
           </button>
         ))}
       </div>
 
-      <TaskList tasks={filteredTasks} onDelete={handleDelete} onToggle={handleToggle} />
+      {/* Task List */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <TaskList tasks={filteredTasks} onDelete={handleDelete} onToggle={handleToggle} />
+      </div>
     </div>
   );
 };
